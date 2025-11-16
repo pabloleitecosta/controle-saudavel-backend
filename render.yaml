@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: controle-saudavel-backend
+    id: srv-d4cu4eq4d50c73de6lp0
+    env: node
+    plan: starter
+    repo: https://github.com/pabloleitecosta/controle-saudavel-backend
+    branch: main
+    rootDir: functions
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_PROJECT_NUMBER
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: VISION_PROVIDER
+        value: multi
+      - key: HF_FOOD_MODEL
+        value: nateraw/food101
+      - key: HF_VIT_MODEL
+        value: google/vit-base-patch16-224
+      - key: HF_CAPTION_MODEL
+        value: Salesforce/blip-image-captioning-base
+      - key: HUGGINGFACE_API_TOKEN
+        sync: false

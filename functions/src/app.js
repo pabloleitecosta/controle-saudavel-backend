@@ -25,7 +25,6 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/food', foodRoutes);
 app.use('/user', userRoutes);
-app.use("/user", require("./routes/insightsRoutes"));
 app.use('/image', imageRoutesFactory(upload));
 app.use('/gamification', gamificationRoutes);
 app.use('/community', communityRoutes);

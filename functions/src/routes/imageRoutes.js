@@ -11,18 +11,15 @@ module.exports = (upload) => {
 
     try {
       const result = await recognizeImage(req.file.buffer);
-      const totalCalories = result.items.reduce((acc, i) => acc + (i.calories || 0), 0);
-      const totalProtein = result.items.reduce((acc, i) => acc + (i.protein || 0), 0);
-      const totalCarbs = result.items.reduce((acc, i) => acc + (i.carbs || 0), 0);
-      const totalFat = result.items.reduce((acc, i) => acc + (i.fat || 0), 0);
-
       res.json({
-        success: true,
-        items: result.items,
-        total_calories: totalCalories,
-        total_protein: totalProtein,
-        total_carbs: totalCarbs,
-        total_fat: totalFat
+        ...result,
+        items: result.items?.map((item) => ({
+          ...item,
+          calories: item.nutrition?.calories,
+          protein: item.nutrition?.protein,
+          carbs: item.nutrition?.carbs,
+          fat: item.nutrition?.fat
+        }))
       });
     } catch (err) {
       console.error('Erro em /image/recognize:', err);

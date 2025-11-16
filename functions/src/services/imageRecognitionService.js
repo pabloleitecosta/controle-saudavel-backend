@@ -25,6 +25,7 @@ const MODELS = {
 };
 
 const HF_TOKEN = process.env.HUGGINGFACE_API_TOKEN;
+const HF_BASE_URL = "https://api-inference.huggingface.co/models/";
 
 // ========================================
 //  FUNÇÃO CENTRAL DE INFERÊNCIA
@@ -241,13 +242,27 @@ function recognizeMock() {
 // Função para chamar API HuggingFace
 // ========================================
 async function hfPost(model, buffer) {
-  const url = `https://api-inference.huggingface.co/models/${model}`;
+  if (!HF_TOKEN) {
+    throw new Error("HUGGINGFACE_API_TOKEN n\u00e3o configurado.");
+  }
+
+  const url = buildModelUrl(model);
   const headers = {
     Authorization: `Bearer ${HF_TOKEN}`,
     "Content-Type": "application/octet-stream"
   };
   const res = await axios.post(url, buffer, { headers, timeout: 20000 });
   return res.data;
+}
+
+function buildModelUrl(model) {
+  if (!model) {
+    throw new Error("Modelo de vis\u00e3o n\u00e3o configurado.");
+  }
+
+  return model.startsWith("http")
+    ? model
+    : `${HF_BASE_URL}${model}`;
 }
 
 module.exports = { recognizeImage };
