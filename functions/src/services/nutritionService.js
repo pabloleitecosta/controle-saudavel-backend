@@ -2,7 +2,9 @@ const axios = require('axios');
 
 exports.getNutritionFromImageUrl = async (imageUrl) => {
   const apiBaseUrl =
-    process.env.API_INTERNAL_BASE_URL || 'https://seu-backend.com/api';
+    process.env.API_INTERNAL_BASE_URL ||
+    process.env.API_BASE_URL ||
+    'https://controle-saudavel-backend.onrender.com';
 
   const response = await axios.post(`${apiBaseUrl}/image/recognize-by-url`, {
     imageUrl,

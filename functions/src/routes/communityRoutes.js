@@ -47,7 +47,10 @@ router.post('/:userId/posts', async (req, res) => {
  * Query: ?limit=20&startAfter=timestampISO
  */
 router.get('/feed', async (req, res) => {
-  const limit = parseInt(req.query.limit || '20', 10);
+  const requestedLimit = parseInt(req.query.limit || '20', 10);
+  const limit = Number.isNaN(requestedLimit)
+    ? 20
+    : Math.max(1, Math.min(requestedLimit, 50));
   const startAfter = req.query.startAfter;
 
   try {
@@ -62,8 +65,10 @@ router.get('/feed', async (req, res) => {
 
     const snap = await query.get();
     const posts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const nextCursor =
+      posts.length === limit && posts.length > 0 ? posts[posts.length - 1].createdAt : null;
 
-    res.json({ posts });
+    res.json({ posts, nextCursor });
   } catch (err) {
     console.error('Erro ao carregar feed:', err);
     res.status(500).json({ error: 'Não foi possível carregar o feed.' });

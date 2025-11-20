@@ -17,7 +17,12 @@ router.get('/:id/summary', async (req, res) => {
     res.json({ success: true, ...summary });
   } catch (err) {
     console.error('Erro ao buscar gamificação:', err);
-    res.status(500).json({ error: 'Não foi possível buscar gamificação.' });
+    res.json({
+      success: false,
+      points: 0,
+      streak: { current: 0, best: 0, lastDate: null },
+      achievements: [],
+    });
   }
 });
 
