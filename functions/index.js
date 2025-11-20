@@ -15,18 +15,17 @@ if (!admin.apps.length) {
   if (serviceAccount.projectId && serviceAccount.clientEmail && serviceAccount.privateKey) {
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
   } else {
-    admin.initializeApp(); // fallback para rodar local com gcloud
+    try {
+      admin.initializeApp();
+    } catch (e) {
+      console.warn(
+        'Firebase admin não inicializado via credenciais de ambiente, usando configuração padrão/local.',
+        e.message,
+      );
+    }
   }
 }
-/**
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp();
-  } catch (e) {
-    console.warn('Firebase admin não inicializado via credenciais de ambiente, usando configuração padrão/local.', e.message);
-  }
-}
-**/
+
 // Exporta como Function HTTPS (modo Firebase)
 exports.api = functions.https.onRequest(app);
 
