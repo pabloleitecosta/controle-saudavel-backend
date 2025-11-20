@@ -11,6 +11,7 @@ const userRoutes = require('./routes/userRoutes');
 const imageRoutesFactory = require('./routes/imageRoutes');
 const gamificationRoutes = require('./routes/gamificationRoutes');
 const communityRoutes = require('./routes/communityRoutes');
+const recipesRoutes = require('./routes/recipesRoutes');
 const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
@@ -28,7 +29,9 @@ app.use('/user', userRoutes);
 app.use('/image', imageRoutesFactory(upload));
 app.use('/gamification', gamificationRoutes);
 app.use('/community', communityRoutes);
+app.use('/api/recipes', recipesRoutes);
 
 
 
 module.exports = app;
+
