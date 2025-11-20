@@ -71,7 +71,7 @@ router.get('/feed', async (req, res) => {
     res.json({ posts, nextCursor });
   } catch (err) {
     console.error('Erro ao carregar feed:', err);
-    res.status(500).json({ error: 'Não foi possível carregar o feed.' });
+    res.json({ posts: [], nextCursor: null, error: 'fallback-feed' });
   }
 });
 
