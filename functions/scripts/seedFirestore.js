@@ -98,8 +98,8 @@ async function seedPosts(userId) {
 }
 
 async function seedCustomFoods(userId) {
-  const col = db.collection('custom_foods');
-  const snap = await col.where('userId', '==', userId).limit(1).get();
+  const col = db.collection('users').doc(userId).collection('custom_foods');
+  const snap = await col.limit(1).get();
   if (!snap.empty) return;
 
   const foods = [
@@ -126,7 +126,6 @@ async function seedCustomFoods(userId) {
   await Promise.all(
     foods.map((food) =>
       col.add({
-        userId,
         createdAt: new Date().toISOString(),
         ...food,
       }),
@@ -168,12 +167,11 @@ async function seedRecipes(userId) {
 }
 
 async function seedMeals(userId) {
-  const col = db.collection('meals');
-  const snap = await col.where('userId', '==', userId).limit(1).get();
+  const col = db.collection('users').doc(userId).collection('meals');
+  const snap = await col.limit(1).get();
   if (!snap.empty) return;
 
   await col.add({
-    userId,
     date: new Date().toISOString().slice(0, 10),
     items: [
       {

@@ -15,7 +15,8 @@ router.get('/:id/meals', async (req, res) => {
 
   try {
     const db = admin.firestore();
-    let query = db.collection('meals').where('userId', '==', id);
+    const mealsCollection = db.collection('users').doc(id).collection('meals');
+    let query = mealsCollection;
 
     if (date) {
       query = query.where('date', '==', date);
@@ -45,8 +46,8 @@ router.post('/:id/meals', async (req, res) => {
 
   try {
     const db = admin.firestore();
-    const ref = await db.collection('meals').add({
-      userId: id,
+    const mealsCollection = db.collection('users').doc(id).collection('meals');
+    const ref = await mealsCollection.add({
       date,
       items,
       totalCalories,
@@ -156,7 +157,7 @@ router.get("/:id/insights", async (req, res) => {
 
   try {
     const db = admin.firestore();
-    const mealsRef = db.collection("meals").where("userId", "==", id);
+    const mealsRef = db.collection('users').doc(id).collection('meals');
     const mealsSnap = await mealsRef.get();
 
     const meals = mealsSnap.docs.map((d) => d.data());

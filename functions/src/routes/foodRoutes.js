@@ -59,8 +59,9 @@ router.get('/custom/:userId', async (req, res) => {
 
   try {
     const snap = await db()
+      .collection('users')
+      .doc(userId)
       .collection('custom_foods')
-      .where('userId', '==', userId)
       .orderBy('createdAt', 'desc')
       .limit(50)
       .get();
@@ -101,7 +102,6 @@ router.post('/custom/:userId', async (req, res) => {
 
   try {
     const payload = {
-      userId,
       name: String(name),
       portionValue: Number(portionValue),
       portionUnit: String(portionUnit),
@@ -115,7 +115,11 @@ router.post('/custom/:userId', async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
-    const ref = await db().collection('custom_foods').add(payload);
+    const ref = await db()
+      .collection('users')
+      .doc(userId)
+      .collection('custom_foods')
+      .add(payload);
     res.status(201).json({ id: ref.id, ...payload });
   } catch (err) {
     console.error('Erro ao criar alimento customizado:', err);
