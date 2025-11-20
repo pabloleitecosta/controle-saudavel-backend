@@ -14,7 +14,10 @@ const serviceAccount = {
 };
 
 if (!admin.apps.length) {
-  if (serviceAccount.projectId && serviceAccount.clientEmail && serviceAccount.privateKey) {
+  console.log('apps.length '+admin.apps.length);
+  console.log('serviceAccount '+serviceAccount.project_id);
+  if (serviceAccount.project_id && serviceAccount.client_email && serviceAccount.private_key) {
+    console.log('Entrou inicialização');
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
   } else {
     try {
