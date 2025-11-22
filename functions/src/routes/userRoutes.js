@@ -88,6 +88,24 @@ router.post('/:id/meals', async (req, res) => {
   }
 });
 
+// DELETE /user/:id/meals/:mealId - remove uma refeicao específica
+router.delete('/:id/meals/:mealId', async (req, res) => {
+  const { id, mealId } = req.params;
+  try {
+    const db = admin.firestore();
+    const mealRef = db.collection('users').doc(id).collection('meals').doc(mealId);
+    const doc = await mealRef.get();
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'Refeicao nao encontrada.' });
+    }
+    await mealRef.delete();
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Erro ao excluir refeicao:', err);
+    res.status(500).json({ error: 'Nao foi possivel excluir a refeicao.' });
+  }
+});
+
 // PUT /user/:id/profile - update profile and recalc goals
 router.put('/:id/profile', async (req, res) => {
   const { id } = req.params;
