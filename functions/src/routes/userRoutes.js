@@ -88,6 +88,53 @@ router.post('/:id/meals', async (req, res) => {
   }
 });
 
+// POST /user/:id/weights - register a weight entry
+router.post('/:id/weights', async (req, res) => {
+  const { id } = req.params;
+  const { weight, date } = req.body;
+
+  const weightNum = typeof weight === 'number' ? weight : Number(weight);
+  if (!weightNum || Number.isNaN(weightNum)) {
+    return res.status(400).json({ error: 'Peso invalido.' });
+  }
+
+  const db = admin.firestore();
+  try {
+    const weightsRef = db.collection('users').doc(id).collection('weights');
+    const entryDate = date || new Date().toISOString().split('T')[0];
+    const ref = await weightsRef.add({
+      weight: weightNum,
+      date: entryDate,
+      recordedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    return res.status(201).json({ id: ref.id, weight: weightNum, date: entryDate });
+  } catch (err) {
+    console.error('Erro ao registrar peso:', err);
+    return res.status(500).json({ error: 'Nao foi possivel registrar o peso.' });
+  }
+});
+
+// GET /user/:id/weights - list weight history
+router.get('/:id/weights', async (req, res) => {
+  const { id } = req.params;
+  const { limit } = req.query;
+  const db = admin.firestore();
+
+  try {
+    let query = db.collection('users').doc(id).collection('weights').orderBy('recordedAt', 'desc');
+    const limitNum = Number(limit);
+    if (limit && !Number.isNaN(limitNum) && limitNum > 0) {
+      query = query.limit(limitNum);
+    }
+    const snap = await query.get();
+    const weights = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return res.json(weights);
+  } catch (err) {
+    console.error('Erro ao buscar pesos:', err);
+    return res.status(500).json({ error: 'Nao foi possivel buscar historico de peso.' });
+  }
+});
+
 // PUT /user/:id/profile - update profile and recalc goals
 router.put('/:id/profile', async (req, res) => {
   const { id } = req.params;
