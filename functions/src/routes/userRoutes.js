@@ -153,6 +153,22 @@ router.get('/:id/weights', async (req, res) => {
   }
 });
 
+// GET /user/:id/profile - retorna dados do perfil
+router.get('/:id/profile', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const db = admin.firestore();
+    const snap = await db.collection('users').doc(id).get();
+    if (!snap.exists) {
+      return res.status(404).json({ error: 'Perfil nao encontrado.' });
+    }
+    return res.json(snap.data());
+  } catch (err) {
+    console.error('Erro ao buscar perfil:', err);
+    return res.status(500).json({ error: 'Nao foi possivel buscar o perfil.' });
+  }
+});
+
 // PUT /user/:id/profile - update profile and recalc goals
 router.put('/:id/profile', async (req, res) => {
   const { id } = req.params;
