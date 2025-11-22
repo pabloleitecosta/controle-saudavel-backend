@@ -112,8 +112,29 @@ router.put('/:id/profile', async (req, res) => {
   const { name, age, height, weight, sex, goal, activityLevel } = req.body;
 
   try {
-    const tmb = calcularTMB({ peso: weight, altura: height, idade: age, sexo: sex });
-    const tdee = tmb ? calcularTDEE(tmb, activityLevel) : null;
+    const ageNum = age === undefined || age === null ? null : Number(age);
+    const heightNum = height === undefined || height === null ? null : Number(height);
+    const weightNum = weight === undefined || weight === null ? null : Number(weight);
+    const activity = activityLevel === undefined || activityLevel === null ? null : Number(activityLevel);
+
+    const hasMetrics =
+      ageNum !== null &&
+      !Number.isNaN(ageNum) &&
+      heightNum !== null &&
+      !Number.isNaN(heightNum) &&
+      weightNum !== null &&
+      !Number.isNaN(weightNum) &&
+      activity !== null &&
+      !Number.isNaN(activity) &&
+      !!sex;
+
+    let tmb = null;
+    let tdee = null;
+
+    if (hasMetrics) {
+      tmb = calcularTMB({ peso: weightNum, altura: heightNum, idade: ageNum, sexo: sex });
+      tdee = tmb ? calcularTDEE(tmb, activity) : null;
+    }
 
     let dailyCaloriesGoal = null;
     if (tdee) {
@@ -130,22 +151,21 @@ router.put('/:id/profile', async (req, res) => {
     }
 
     const db = admin.firestore();
-    await db.collection('users').doc(id).set(
-      {
-        name,
-        age,
-        height,
-        weight,
-        sex,
-        goal,
-        activityLevel,
-        tmb,
-        tdee,
-        dailyCaloriesGoal,
-        updatedAt: new Date().toISOString(),
-      },
-      { merge: true },
-    );
+    const profileData = {
+      updatedAt: new Date().toISOString(),
+    };
+    if (name !== undefined) profileData.name = name ?? null;
+    if (age !== undefined) profileData.age = ageNum;
+    if (height !== undefined) profileData.height = heightNum;
+    if (weight !== undefined) profileData.weight = weightNum;
+    if (sex !== undefined) profileData.sex = sex ?? null;
+    if (goal !== undefined) profileData.goal = goal ?? null;
+    if (activityLevel !== undefined) profileData.activityLevel = activity;
+    profileData.tmb = tmb;
+    profileData.tdee = tdee;
+    profileData.dailyCaloriesGoal = dailyCaloriesGoal;
+
+    await db.collection('users').doc(id).set(profileData, { merge: true });
 
     res.json({ success: true, tmb, tdee, dailyCaloriesGoal });
   } catch (err) {
